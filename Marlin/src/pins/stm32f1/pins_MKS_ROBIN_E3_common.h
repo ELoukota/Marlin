@@ -25,7 +25,9 @@
  * MKS Robin E3 & E3D (STM32F103RCT6) common board pin assignments
  */
 
-#include "env_validate.h"
+#if NOT_TARGET(__STM32F1__)
+  #error "Oops! Select an STM32F1 board in 'Tools > Board.'"
+#endif
 
 #define BOARD_NO_NATIVE_USB
 
@@ -178,10 +180,10 @@
 //
 #define SPI_DEVICE                             2
 #define SD_DETECT_PIN                       PC10
-#define SD_SCK_PIN                          PB13
-#define SD_MISO_PIN                         PB14
-#define SD_MOSI_PIN                         PB15
-#define SD_SS_PIN                           PA15
+#define SCK_PIN                             PB13
+#define MISO_PIN                            PB14
+#define MOSI_PIN                            PB15
+#define SS_PIN                              PA15
 
 #ifndef BOARD_ST7920_DELAY_1
   #define BOARD_ST7920_DELAY_1     DELAY_NS(125)

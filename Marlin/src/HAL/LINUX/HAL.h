@@ -60,8 +60,8 @@ uint8_t _getc();
 
 #define SHARED_SERVOS HAS_SERVOS
 
-extern MSerialT usb_serial;
-#define MYSERIAL1 usb_serial
+extern HalSerial usb_serial;
+#define MYSERIAL0 usb_serial
 
 #define ST7920_DELAY_1 DELAY_NS(600)
 #define ST7920_DELAY_2 DELAY_NS(750)
@@ -107,9 +107,14 @@ uint16_t HAL_adc_get_result();
 inline void HAL_clear_reset_source(void) {}
 inline uint8_t HAL_get_reset_source(void) { return RST_POWER_ON; }
 
-void HAL_reboot(); // Reset the application state and GPIO
+inline void HAL_reboot() {}  // reboot the board or restart the bootloader
 
 /* ---------------- Delay in cycles */
 FORCE_INLINE static void DELAY_CYCLES(uint64_t x) {
   Clock::delayCycles(x);
 }
+
+// Add strcmp_P if missing
+#ifndef strcmp_P
+  #define strcmp_P(a, b) strcmp((a), (b))
+#endif

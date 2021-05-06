@@ -22,9 +22,10 @@
  ****************************************************************************/
 
 #include "../config.h"
-#include "screens.h"
 
-#ifdef FTDI_MAIN_MENU
+#if ENABLED(TOUCH_UI_FTDI_EVE) && NONE(TOUCH_UI_LULZBOT_BIO,TOUCH_UI_COCOA_PRESS)
+
+#include "screens.h"
 
 using namespace FTDI;
 using namespace Theme;
@@ -36,17 +37,12 @@ void MainMenu::onRedraw(draw_mode_t what) {
        .cmd(CLEAR(true,true,true));
   }
 
-  #if ENABLED(TOUCH_UI_PORTRAIT)
+  #ifdef TOUCH_UI_PORTRAIT
     #define GRID_ROWS 8
     #define GRID_COLS 2
     #define ABOUT_PRINTER_POS     BTN_POS(1,1), BTN_SIZE(2,1)
     #define ADVANCED_SETTINGS_POS BTN_POS(1,2), BTN_SIZE(2,1)
-    #if ENABLED(CUSTOM_MENU_MAIN)
-      #define FILAMENTCHANGE_POS  BTN_POS(1,3), BTN_SIZE(1,1)
-      #define CUSTOM_MENU_POS BTN_POS(2,3), BTN_SIZE(1,1)
-    #else
-      #define FILAMENTCHANGE_POS  BTN_POS(1,3), BTN_SIZE(2,1)
-    #endif
+    #define FILAMENTCHANGE_POS    BTN_POS(1,3), BTN_SIZE(2,1)
     #define TEMPERATURE_POS       BTN_POS(1,4), BTN_SIZE(2,1)
     #define DISABLE_STEPPERS_POS  BTN_POS(1,5), BTN_SIZE(2,1)
     #define MOVE_AXIS_POS         BTN_POS(1,6), BTN_SIZE(1,1)
@@ -56,23 +52,17 @@ void MainMenu::onRedraw(draw_mode_t what) {
     #define BACK_POS              BTN_POS(1,8), BTN_SIZE(2,1)
   #else
     #define GRID_ROWS 5
-    #define GRID_COLS 6
-    #define ADVANCED_SETTINGS_POS BTN_POS(1,1), BTN_SIZE(3,1)
-    #define ABOUT_PRINTER_POS     BTN_POS(4,1), BTN_SIZE(3,1)
-    #define AUTO_HOME_POS         BTN_POS(1,2), BTN_SIZE(3,1)
-    #define CLEAN_NOZZLE_POS      BTN_POS(4,2), BTN_SIZE(3,1)
-    #define MOVE_AXIS_POS         BTN_POS(1,3), BTN_SIZE(3,1)
-    #define DISABLE_STEPPERS_POS  BTN_POS(4,3), BTN_SIZE(3,1)
-    #if ENABLED(CUSTOM_MENU_MAIN)
-      #define TEMPERATURE_POS     BTN_POS(1,4), BTN_SIZE(2,1)
-      #define FILAMENTCHANGE_POS  BTN_POS(3,4), BTN_SIZE(2,1)
-      #define CUSTOM_MENU_POS BTN_POS(5,4), BTN_SIZE(2,1)
-    #else
-      #define TEMPERATURE_POS     BTN_POS(1,4), BTN_SIZE(3,1)
-      #define FILAMENTCHANGE_POS  BTN_POS(4,4), BTN_SIZE(3,1)
-    #endif
-    #define LEVELING_POS          BTN_POS(1,5), BTN_SIZE(3,1)
-    #define BACK_POS              BTN_POS(4,5), BTN_SIZE(3,1)
+    #define GRID_COLS 2
+    #define ADVANCED_SETTINGS_POS BTN_POS(1,1), BTN_SIZE(1,1)
+    #define ABOUT_PRINTER_POS     BTN_POS(2,1), BTN_SIZE(1,1)
+    #define AUTO_HOME_POS         BTN_POS(1,2), BTN_SIZE(1,1)
+    #define CLEAN_NOZZLE_POS      BTN_POS(2,2), BTN_SIZE(1,1)
+    #define MOVE_AXIS_POS         BTN_POS(1,3), BTN_SIZE(1,1)
+    #define DISABLE_STEPPERS_POS  BTN_POS(2,3), BTN_SIZE(1,1)
+    #define TEMPERATURE_POS       BTN_POS(1,4), BTN_SIZE(1,1)
+    #define FILAMENTCHANGE_POS    BTN_POS(2,4), BTN_SIZE(1,1)
+    #define LEVELING_POS          BTN_POS(1,5), BTN_SIZE(1,1)
+    #define BACK_POS              BTN_POS(2,5), BTN_SIZE(1,1)
   #endif
 
   if (what & FOREGROUND) {
@@ -91,9 +81,6 @@ void MainMenu::onRedraw(draw_mode_t what) {
        .enabled(TERN_(HAS_LEVELING, 1))
        .tag( 9).button(LEVELING_POS,        GET_TEXT_F(MSG_LEVELING))
        .tag(10).button(ABOUT_PRINTER_POS,   GET_TEXT_F(MSG_INFO_MENU))
-       #if ENABLED(CUSTOM_MENU_MAIN)
-        .tag(11).button(CUSTOM_MENU_POS, GET_TEXT_F(MSG_CUSTOM_COMMANDS))
-       #endif
        .colors(action_btn)
        .tag(1).button(BACK_POS,             GET_TEXT_F(MSG_BACK));
   }
@@ -106,25 +93,21 @@ bool MainMenu::onTouchEnd(uint8_t tag) {
     case 1:  SaveSettingsDialogBox::promptToSaveSettings();           break;
     case 2:  SpinnerDialogBox::enqueueAndWait_P(F("G28"));            break;
     #if ENABLED(NOZZLE_CLEAN_FEATURE)
-      case 3: injectCommands_P(PSTR("G12")); GOTO_SCREEN(StatusScreen); break;
+    case 3: injectCommands_P(PSTR("G12")); GOTO_SCREEN(StatusScreen); break;
     #endif
     case 4:  GOTO_SCREEN(MoveAxisScreen);                             break;
     case 5:  injectCommands_P(PSTR("M84"));                           break;
     case 6:  GOTO_SCREEN(TemperatureScreen);                          break;
     case 7:  GOTO_SCREEN(ChangeFilamentScreen);                       break;
     case 8:  GOTO_SCREEN(AdvancedSettingsMenu);                       break;
-    #if HAS_LEVELING
-      case 9:  GOTO_SCREEN(LevelingMenu);                             break;
+    #ifdef HAS_LEVELING
+    case 9:  GOTO_SCREEN(LevelingMenu);                               break;
     #endif
     case 10: GOTO_SCREEN(AboutScreen);                                break;
-    #if ENABLED(CUSTOM_MENU_MAIN)
-      case 11: GOTO_SCREEN(CustomUserMenus);                          break;
-    #endif
-
     default:
       return false;
   }
   return true;
 }
 
-#endif // FTDI_MAIN_MENU
+#endif // TOUCH_UI_FTDI_EVE && !TOUCH_UI_LULZBOT_BIO

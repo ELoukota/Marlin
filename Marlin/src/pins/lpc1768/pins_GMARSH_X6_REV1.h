@@ -21,7 +21,9 @@
  */
 #pragma once
 
-#include "env_validate.h"
+#if NOT_TARGET(MCU_LPC1768)
+  #error "Oops! Make sure you have the LPC1768 environment selected in your IDE."
+#endif
 
 #define BOARD_INFO_NAME "GMARSH X6 REV1"
 
@@ -119,7 +121,6 @@
 // Misc. Functions
 //
 #define LED_PIN                            P1_31
-#define POWER_MONITOR_VOLTAGE_PIN       P0_25_A2
 
 //
 // LCD
@@ -153,14 +154,15 @@
 #define ONBOARD_SD_CS_PIN                  P0_06  // Chip select for "System" SD card
 
 #if SD_CONNECTION_IS(LCD)
-  #define SD_SCK_PIN                       P0_15
-  #define SD_MISO_PIN                      P0_17
-  #define SD_MOSI_PIN                      P0_18
-  #define SD_SS_PIN                        P0_16
-  #define SD_DETECT_PIN                    P1_22
+  #define SCK_PIN                          P0_15
+  #define MISO_PIN                         P0_17
+  #define MOSI_PIN                         P0_18
+  #define SS_PIN                           P0_16
 #elif SD_CONNECTION_IS(ONBOARD)
-  #define SD_SCK_PIN                       P0_07
-  #define SD_MISO_PIN                      P0_08
-  #define SD_MOSI_PIN                      P0_09
-  #define SD_SS_PIN            ONBOARD_SD_CS_PIN
+  #undef SD_DETECT_PIN
+  #define SD_DETECT_PIN                    P0_27
+  #define SCK_PIN                          P0_07
+  #define MISO_PIN                         P0_08
+  #define MOSI_PIN                         P0_09
+  #define SS_PIN               ONBOARD_SD_CS_PIN
 #endif

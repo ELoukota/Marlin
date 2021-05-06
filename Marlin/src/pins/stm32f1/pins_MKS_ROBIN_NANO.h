@@ -36,9 +36,6 @@
 
 #define BOARD_NO_NATIVE_USB
 
-// Avoid conflict with TIMER_SERVO when using the STM32 HAL
-#define TEMP_TIMER 5
-
 //
 // Release PB4 (Y_ENABLE_PIN) from JTAG NRST role
 //
@@ -55,11 +52,6 @@
 #endif
 
 #define SPI_DEVICE                             2
-
-//
-// Servos
-//
-#define SERVO0_PIN                          PA8   // Enable BLTOUCH
 
 //
 // Limit Switches
@@ -152,6 +144,8 @@
   #define FIL_RUNOUT_PIN                    PA4
   #define FIL_RUNOUT2_PIN                   PE6
 #endif
+
+#define SERVO0_PIN                          PA8   // Enable BLTOUCH support
 
 //#define LED_PIN                           PB2
 
